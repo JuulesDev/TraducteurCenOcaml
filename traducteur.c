@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
+#include "lexeme_list.h"
 #include "lexer.h"
 
 int main()
