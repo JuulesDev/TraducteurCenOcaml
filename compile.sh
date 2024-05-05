@@ -1,0 +1,1 @@
+gcc traducteur.c lexer.c lexeme_list.c -o Traducteur
