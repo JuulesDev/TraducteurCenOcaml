@@ -72,8 +72,8 @@ bool is_string_in(char* s, const char* tab[], const int len)
 // === LEXEUR ===
 
 // Listes des lexèmes qu'on souhaite détecter.
-const char ponctuation[] = {'(', ')', '{', '}', ' ', '\n', ';'};
-const int len_ponctuation = 7;
+const char ponctuation[] = {'(', ')', '{', '}', ';'};
+const int len_ponctuation = 5;
 
 const char* type[] = {"bool", "int", "void"};
 const int len_type = 3; 
@@ -100,8 +100,7 @@ maillon* lexeur(FILE* fichier)
 {
     // Crée le maillon de début.
     maillon* debut = malloc(sizeof(maillon));
-    debut->argument = malloc(6*sizeof(char));
-    strcpy (debut->argument, "DEBUT"); // Marque le début des lexèmes.
+    debut->argument = cree_arg("DEBUT", 5); // Marque le début des lexèmes.
     debut->lexeme = 'D'; 
     debut->suivant = NULL;
     maillon* fin = debut; // Pour ajouter de nouveaux maillons.
@@ -194,23 +193,29 @@ maillon* lexeur(FILE* fichier)
 
             if (is_string_in(chaine, type, len_type))
             {
-                ajoute_maillon_fin (&fin, 'T', chaine); // T -> Type
+                ajoute_maillon_fin(&fin, 'T', chaine); // T -> Type
             }
             else if (is_string_in(chaine, motcle, len_motcle))
             {
-                ajoute_maillon_fin (&fin, 'M', chaine); // M -> Mot-clé
+                ajoute_maillon_fin(&fin, 'M', chaine); // M -> Mot-clé
             }
             else
             {
-                ajoute_maillon_fin (&fin, 'V', chaine); // V -> Variable
+                ajoute_maillon_fin(&fin, 'V', chaine); // V -> Variable
             }
         } 
+        else if (c == ' ' || c == '\n')
+        { // Cas 7 : Ignore les espaces blancs
+            c = fgetc(fichier);
+        }
         else
         {
             fprintf(stderr, "Le charactère %c de numéro %d n'a pas été reconnu.", c, (int) c);
             exit(1);
         }
     }
+
+    ajoute_maillon_fin(&fin, 'F', cree_arg("FIN", 3)); // F -> EOF
 
     return debut;
 }
