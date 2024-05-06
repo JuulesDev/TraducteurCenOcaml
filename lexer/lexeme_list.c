@@ -9,37 +9,37 @@
     Ajoute un maillon à la fin de la liste chaînée.
 
     Arguments:
-        - maillon** pfin: Un pointeur vers le dernier maillon de la liste.
-        - char lex: Le type de lexème du nouveau maillon.
-        - char* arg: L'argument du nouveau maillon.
+        - lexeme_list** last_elem: Un pointeur vers le dernier maillon de la liste.
+        - LexemeType type: Le type de lexème du nouveau maillon.
+        - char* content: L'argument du nouveau maillon.
 */
-void ajoute_maillon_fin(maillon** pfin, char lex, char* arg)
+void add_list(lexeme_list** last_elem, LexemeType type, char* content)
 {
     // printf(">> Nouveau maillon (lex:%c) (arg:%s)\n", lex, arg);
     // Création du nouveau maillon
-    maillon* nv_maillon = malloc(sizeof(maillon));
-    nv_maillon->lexeme = lex;
-    nv_maillon->argument = arg;
-    nv_maillon->suivant = NULL;
+    lexeme_list* new_elem = malloc(sizeof(lexeme_list));
+    new_elem->type = type;
+    new_elem->content = content;
+    new_elem->next = NULL;
     // Ajoute le maillon à la fin de la liste
-    (*pfin)->suivant = nv_maillon;
-    *pfin = nv_maillon;
+    (*last_elem)->next = new_elem;
+    *last_elem = new_elem;
 }
 
 /*
     Affiche une liste chaînée de lexèmes.
 
     Arguments:
-        - maillon* debut: Le premier maillon de la liste chaînée à afficher.
+        - lexeme_list* lex: Le premier maillon de la liste chaînée à afficher.
 */
-void affiche_liste(maillon* debut)
+void print_list(lexeme_list* lex)
 {
-    maillon* m = debut;
+    lexeme_list* m = lex;
     printf("Liste de lexèmes : (\n");
     while (m != NULL)
     {
-        printf("  [%c, '%s']\n", m->lexeme, m->argument);
-        m = m->suivant;
+        printf("  [%c, '%s']\n", m->type, m->content);
+        m = m->next;
     }
     printf(")\n");
 }
@@ -48,18 +48,18 @@ void affiche_liste(maillon* debut)
     Libère l'espace alloué à une liste chaînée.
 
     Arguments:
-        - maillon* debut: Le premier maillon de la liste chaînée à libérer.
+        - lexeme_list* lex: Le premier maillon de la liste chaînée à libérer.
 */
-void libere_liste(maillon* debut)
+void free_list(lexeme_list* lex)
 {
-    if (debut != NULL)
+    if (lex != NULL)
     {
         // Libère récursivement la liste chaînée.
-        libere_liste(debut->suivant);
+        free_list(lex->next);
         // Libère l'argument s'il a été alloué avec un malloc.
-        if (debut->argument != NULL){
-            free(debut->argument);
+        if (lex->content != NULL){
+            free(lex->content);
         }
-        free(debut);
+        free(lex);
     }
 }

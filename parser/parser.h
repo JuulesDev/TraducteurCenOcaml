@@ -7,6 +7,9 @@
 
 // -> syntax_tree.c
 
+/*
+    Un type de node d'un AST.
+*/
 typedef enum {
     CONST_VAL,
     SIMPLE_OP,
@@ -14,48 +17,51 @@ typedef enum {
     DECLARATION,
 } AstNodeType;
 
-typedef struct {
-    char* value;
-} const_val;
-
-typedef struct {
-    char* type;
-    ast_node* expr;
-} simple_op;
-
-typedef struct {
-    char* type;
-    ast_node* left_expr;
-    ast_node* right_expr;
-} double_op;
-
-typedef struct {
-    char* variable_name;
-    ast_node* expr;
-} declaration;
-
-typedef struct  {
+/*
+    Une noeud d'un AST.
+*/
+struct ast_node {
     AstNodeType type;
     union {
-        const_val const_val_node;
-        simple_op simple_op_node;
-        double_op double_op_node;
-        declaration declaration_node;
+        struct {
+            char* value;
+        } const_val;
+        struct {
+            char* type;
+            struct ast_node* expr;
+        } simple_op_node;
+        struct {
+            char* type;
+            struct ast_node* left_expr;
+            struct ast_node* right_expr;
+        } double_op_node;
+        struct {
+            char* variable_name;
+            struct ast_node* expr;
+        } declaration_node;
     };
-} ast_node;
+};
+typedef struct ast_node ast_node;
 
+/*
+    Représente un AST, ou plutôt un tableau d'AST.
+*/
 typedef struct {
     int n_instructions;
     ast_node** instructions;
 } ast;
 
-ast* create_node(char* value, ast* leftop, ast* rightop);
+ast_node* create_ast_node(AstNodeType type);
 
-void affiche_tree(ast* tree, int depth);
+ast* create_ast();
+
+void free_ast(ast* tree);
+
+void print_tree(ast tree);
 
 
 // -> parser.c
 
-ast* parse(maillon* lexemes);
+ast* parse(lexeme_list* lexemes);
 
 #endif

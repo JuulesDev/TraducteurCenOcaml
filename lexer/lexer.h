@@ -9,29 +9,45 @@
 // -> lexemes_list.c
 
 /*
+    Un type de lexème.
+*/
+typedef enum {
+    LmxStart,
+    LxmEnd,
+    LxmInt,
+    LxmString,
+    LxmPunctuation,
+    LxmOperator,
+    LxmAffectation,
+    LxmType,
+    LxmKeyWord,
+    LxmVariable
+} LexemeType;
+
+/*
     Une liste de chainees classique de lexemes.
 */
-struct maillon {
-    char lexeme; // Le nom du lexème.
-    char* argument; // La valeur du lexeme.
-    struct maillon* suivant;
+struct lexeme_list {
+    LexemeType type; // Le type de lexème.
+    char* content; // La valeur du lexeme.
+    struct lexeme_list* next;
 };
-typedef struct maillon maillon;
+typedef struct lexeme_list lexeme_list;
 
-void ajoute_maillon_fin(maillon** pfin, char lex, char* arg);
+void add_list(lexeme_list** pfin, LexemeType type, char* content);
 
-void affiche_liste(maillon* debut);
+void print_list(lexeme_list* lex);
 
-void libere_liste(maillon* debut);
+void free_list(lexeme_list* lex);
 
 // -> lexer.c
 
-bool char_in ( char c, const char tab[], const int len);
+char* create_arg( char* buffer, const int len);
 
-bool string_in ( char* c, const char* tab[], const int len);
+bool is_char_in( char c, const char tab[], const int len);
 
-char* cree_arg( char* buffer, const int len);
+bool is_string_in ( char* c, const char* tab[], const int len);
 
-maillon* lexeur (FILE* fichier);
+lexeme_list* lexeur (FILE* fichier);
 
 #endif

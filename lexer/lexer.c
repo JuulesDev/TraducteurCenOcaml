@@ -12,19 +12,19 @@
 
     Arguments:
         - char* buffer: Le buffer contenant les caractères à "normaliser".
-        - int taille_buffer: La taille du buffer.
+        - int len_buffer: La taille du buffer.
 
     Renvoie:
         - char*: Une string correcte.
 */
-char* cree_arg(char* buffer, const int taille_buffer)
+char* create_arg(char* buffer, const int len_buffer)
 {
-    char* arg = malloc((taille_buffer+1) * sizeof(char));
-    for (int i = 0; i < taille_buffer; i++)
+    char* arg = malloc((len_buffer+1) * sizeof(char));
+    for (int i = 0; i < len_buffer; i++)
     {
         arg[i] = buffer[i];
     }
-    arg[taille_buffer] = '\0'; // Caractère de fin de string.
+    arg[len_buffer] = '\0'; // Caractère de fin de string.
     return arg;
 }
 
@@ -83,7 +83,7 @@ const int len_motcle = 1;
 const char operateurs_simples[] = {'+', '-', '/', '*', '%'};
 const int len_ops = 5;
 
-    const char operateurs_doubles[] = {'=', '|', '&','<','>','!'};
+const char operateurs_doubles[] = {'=', '|', '&','<','>','!'};
 const int len_opd = 6;
 
 /*
@@ -93,47 +93,46 @@ const int len_opd = 6;
         - FILE* fichier: Le fichier source.
 
     Renvoie:
-        - maillon*: La liste de lexèmes issue du fichier.
+        - lexeme_list*: La liste de lexèmes issue du fichier.
 */
-maillon* lexeur(FILE* fichier)
+lexeme_list* lexeur(FILE* fichier)
 {
     // Crée le maillon de début.
-    maillon* debut = malloc(sizeof(maillon));
-    debut->argument = cree_arg("DEBUT", 5); // Marque le début des lexèmes.
-    debut->lexeme = 'D'; 
-    debut->suivant = NULL;
-    maillon* fin = debut; // Pour ajouter de nouveaux maillons.
+    lexeme_list* lex = malloc(sizeof(lexeme_list));
+    lex->type = LmxStart; 
+    lex->content = NULL;
+    lexeme_list* fin = lex; // Pour ajouter de nouveaux maillons.
 
     // Buffer permettant de lire les arguments.
     char buffer[100];
-    int taille_buffer;
+    int len_buffer;
 
     char c = fgetc(fichier);
     while (c != EOF)
     {
-        taille_buffer = 0; // On vide le buffer.
+        len_buffer = 0; // On vide le buffer.
 
         if ('0' <= c && c <= '9')
         { // Cas 1 : Entier
             while ('0' <= c && c <= '9')
             {
-                buffer[taille_buffer] = c;
-                taille_buffer += 1;
+                buffer[len_buffer] = c;
+                len_buffer += 1;
                 c = fgetc(fichier);
             }
-            ajoute_maillon_fin(&fin, '0', cree_arg(buffer, taille_buffer));
+            add_list(&fin, LxmInt, create_arg(buffer, len_buffer));
         } 
         else if (is_char_in(c, ponctuation, len_ponctuation))
         { // Cas 2 : Ponctuation
-            char* arg = cree_arg(&c, 1);
-            ajoute_maillon_fin (&fin, 'P', arg); // 'P' -> ponctuation
+            char* arg = create_arg(&c, 1);
+            add_list(&fin, LxmPunctuation, arg);
 
             c = fgetc(fichier);
         } 
         else if (is_char_in(c, operateurs_simples, len_ops))
         { // Cas 3 : Opérateur simple
-            char* arg = cree_arg(&c, 1);
-            ajoute_maillon_fin (&fin, 'O', arg); // O -> Opérateur
+            char* arg = create_arg(&c, 1);
+            add_list(&fin, LxmOperator, arg);
             
             c = fgetc(fichier);
         }
@@ -146,37 +145,37 @@ maillon* lexeur(FILE* fichier)
             {
                 buffer[0] = d;
                 buffer[1] = c;
-                taille_buffer = 2;
+                len_buffer = 2;
 
-                ajoute_maillon_fin(
-                    &fin, 'B', // B -> Opérateur binaire
-                    cree_arg(buffer, taille_buffer)
+                add_list(
+                    &fin, LxmOperator,
+                    create_arg(buffer, len_buffer)
                 );
 
                 c = fgetc(fichier);
             }
             else if (d == '=')
             {
-                char* arg = cree_arg(&d, 1);
-                ajoute_maillon_fin (&fin, 'E', arg); // E -> Affectation
+                char* arg = create_arg(&d, 1);
+                add_list(&fin, LxmAffectation, arg);
             }
             else
             {
-                char* arg = cree_arg(&d, 1);
-                ajoute_maillon_fin(&fin, 'B', arg); // Devrait être O ?
+                char* arg = create_arg(&d, 1);
+                add_list(&fin, LxmOperator, arg);
             }
         } 
         else if (c == '"')
         { // Cas 5 : Chaîne de caractères
             c = fgetc(fichier);
             while (c != '"'){
-                buffer[taille_buffer] = c;
-                taille_buffer++;
+                buffer[len_buffer] = c;
+                len_buffer++;
                 c = fgetc(fichier);
             }
             
             c = fgetc(fichier);
-            ajoute_maillon_fin (&fin, 'S', cree_arg(buffer, taille_buffer));
+            add_list (&fin, LxmString, create_arg(buffer, len_buffer));
 
         } 
         else if (('a' <= c && c <='z') || ('A' <= c && c <='Z'))
@@ -184,23 +183,23 @@ maillon* lexeur(FILE* fichier)
             // Lis l'entiereté du mot-clé
             while (('a' <= c && c <='z') || ('A' <= c && c <='Z'))
             {
-                buffer[taille_buffer] = c;
-                taille_buffer++;
+                buffer[len_buffer] = c;
+                len_buffer++;
                 c = fgetc(fichier);
             }
-            char* chaine = cree_arg(buffer, taille_buffer);
+            char* chaine = create_arg(buffer, len_buffer);
 
             if (is_string_in(chaine, type, len_type))
             {
-                ajoute_maillon_fin(&fin, 'T', chaine); // T -> Type
+                add_list(&fin, LxmType, chaine);
             }
             else if (is_string_in(chaine, motcle, len_motcle))
             {
-                ajoute_maillon_fin(&fin, 'M', chaine); // M -> Mot-clé
+                add_list(&fin, LxmKeyWord, chaine);
             }
             else
             {
-                ajoute_maillon_fin(&fin, 'V', chaine); // V -> Variable
+                add_list(&fin, LxmVariable, chaine);
             }
         } 
         else if (c == ' ' || c == '\n')
@@ -214,7 +213,7 @@ maillon* lexeur(FILE* fichier)
         }
     }
 
-    ajoute_maillon_fin(&fin, 'F', cree_arg("FIN", 3)); // F -> EOF
+    add_list(&fin, LxmEnd, NULL);
 
-    return debut;
+    return lex;
 }

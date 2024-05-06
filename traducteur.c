@@ -9,15 +9,17 @@
 int main()
 {
     // Cree la liste de lexemes du fichier
-    FILE* fichier_source = fopen("./test.c", "r");
-    // FILE* fichier_source = fopen("./tests/etape1/etape1.c", "r");
-    maillon* l = lexeur(fichier_source);
+    FILE* source_file = fopen("./test.c", "r");
+    // FILE* source_file = fopen("./tests/etape1/etape1.c", "r");
+    lexeme_list* l = lexeur(source_file);
 
-    affiche_liste(l);
 
-    syntax_tree* ast = parse(l);
+    ast* ast = parse(l);
 
-    affiche_tree(ast, 0);
+    printf("\n===\n");
 
-    libere_liste(l);
+    print_list(l);
+    print_tree(*ast);
+
+    free_list(l);
 }

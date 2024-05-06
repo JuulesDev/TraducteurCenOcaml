@@ -5,76 +5,24 @@
 
 #include "parser.h"
 
+/*
+    Crée un AST à partir d'une liste de lexèmes.
 
-// PARSER
+    Arguments:
+        - lexeme_list* lexemes: La liste de lexèmes d'origine.
 
-syntax_tree* parse_math(maillon** lex, char* closing_lexeme)
-{ // Ne fonctionne presque pas du tout :)
-    if ((*lex)->suivant->lexeme == 'P' && !strcmp((*lex)->suivant->argument, closing_lexeme))
-    {
-        syntax_tree* constant = create_node((*lex)->argument, NULL, NULL);
-        (*lex) = (*lex)->suivant->suivant;
-        return constant;
-    }
-    else
-    {
-        syntax_tree* leftop = create_node((*lex)->argument, NULL, NULL);
-        (*lex) = (*lex)->suivant;
-        char* operator = (*lex)->argument;
-        (*lex) = (*lex)->suivant;
-        printf("----> %s %s %s\n", leftop->value, operator, (*lex)->argument);
-
-        if (!strcmp((*lex)->argument, "("))
-        {
-            (*lex) = (*lex)->suivant;
-            return create_node(operator, leftop, parse_math(lex, ")"));
-        }
-        else
-        {
-            printf("WTF\n");
-            return NULL;
-        }
-    }
-}
-
-
-syntax_tree* parse(maillon* lexemes)
+    Renvoie:
+        - ast*: L'AST créé.
+*/
+ast* parse(lexeme_list* lexemes)
 {
-    syntax_tree* ast_root = create_node("ROOT", NULL, NULL);
-    syntax_tree* ast_end = ast_root; // Derniere feuille de l'AST.
+    ast* ast_tree = create_ast();
 
-    maillon* lex = lexemes->suivant; // Le lexeme actuel (passe le premier).
-    while (lex->lexeme != 'F')
+    lexeme_list* lex = lexemes->next; // Le lexeme actuel (passe le premier).
+    while (lex->type != LxmEnd)
     {
-        switch (lex->lexeme)
-        {
-        case 'T': // /!\ Aucune verification de la validite des lexemes
-            char* type = lex->argument;
-            lex = lex->suivant;
-            syntax_tree* name_node = create_node(lex->argument, NULL, NULL);
-            lex = lex->suivant;
-
-            if (lex->lexeme == 'E')
-            { // Variable
-                lex = lex->suivant;
-                syntax_tree* value_node = parse_math(&lex, ";");
-                syntax_tree* assignation_node = create_node("ASSIGN", name_node, value_node);
-
-                ast_end->next = assignation_node;
-                ast_end = assignation_node;
-            }
-            else if (lex->argument == "(")
-            { // Fonction
-
-            }
-            break;
-        
-        default:
-            printf("Lexeme non reconnu ('%c' : '%s').\n", lex->lexeme, lex->argument);
-            lex->lexeme = 'F';
-            break;
-        }
+        lex = lex->next;
     }
 
-    return ast_root;
+    return ast_tree;
 }
