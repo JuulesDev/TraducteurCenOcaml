@@ -16,10 +16,10 @@ struct maillon {
 };
 typedef struct maillon maillon;
 
-void ajoute_maillon_fin (maillon** pfin, char lex, char* arg);
+void ajoute_maillon_fin(maillon** pfin, char lex, char* arg);
 
-void affiche_liste (maillon* debut);
+void affiche_liste(maillon* debut);
 
-void libere_liste (maillon* debut);;
+void libere_liste(maillon* debut);
 
 #endif
