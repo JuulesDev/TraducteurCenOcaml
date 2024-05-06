@@ -3,9 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "lexeme_list.h"
-#include "lexer.h"
-#include "parser.h"
+#include "./lexer/lexer.h"
+#include "./parser/parser.h"
 
 int main()
 {

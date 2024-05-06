@@ -1,1 +1,1 @@
-gcc traducteur.c lexer.c lexeme_list.c parser.c -o Traducteur
+gcc traducteur.c ./lexer/*.c ./parser/*.c -o Traducteur

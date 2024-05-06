@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 #include "lexer.h"
-#include "lexeme_list.h"
 
 // === FONCTIONS UTILITAIRES ===
 

@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 #include "parser.h"
-#include "lexeme_list.h"
 
 
 syntax_tree* create_node(char* value, syntax_tree* leftop, syntax_tree* rightop)
