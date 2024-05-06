@@ -5,16 +5,57 @@
 #define PARSER_H
 
 
-struct syntax_tree {
+// -> syntax_tree.c
+
+typedef enum {
+    CONST_VAL,
+    SIMPLE_OP,
+    DOUBLE_OP,
+    DECLARATION,
+} AstNodeType;
+
+typedef struct {
     char* value;
-    struct syntax_tree* leftop;
-    struct syntax_tree* rightop;
-    struct syntax_tree* next;
-};
-typedef struct syntax_tree syntax_tree;
+} const_val;
 
-void affiche_tree(syntax_tree* tree, int depth);
+typedef struct {
+    char* type;
+    ast_node* expr;
+} simple_op;
 
-syntax_tree* parse(maillon* lexemes);
+typedef struct {
+    char* type;
+    ast_node* left_expr;
+    ast_node* right_expr;
+} double_op;
+
+typedef struct {
+    char* variable_name;
+    ast_node* expr;
+} declaration;
+
+typedef struct  {
+    AstNodeType type;
+    union {
+        const_val const_val_node;
+        simple_op simple_op_node;
+        double_op double_op_node;
+        declaration declaration_node;
+    };
+} ast_node;
+
+typedef struct {
+    int n_instructions;
+    ast_node** instructions;
+} ast;
+
+ast* create_node(char* value, ast* leftop, ast* rightop);
+
+void affiche_tree(ast* tree, int depth);
+
+
+// -> parser.c
+
+ast* parse(maillon* lexemes);
 
 #endif

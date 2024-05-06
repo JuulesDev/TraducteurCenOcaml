@@ -6,33 +6,6 @@
 #include "parser.h"
 
 
-syntax_tree* create_node(char* value, syntax_tree* leftop, syntax_tree* rightop)
-{
-    syntax_tree* node = malloc(sizeof(syntax_tree));
-    node->value = value;
-    node->leftop = leftop;
-    node->rightop = rightop;
-    node->next = NULL;
-    return node; 
-}
-
-void n_tab(int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        printf("  ");
-    } 
-}
-
-void affiche_tree(syntax_tree* tree, int depth) {
-    printf("Node(%s){\n", tree->value);
-    n_tab(depth); printf("  lop: "); if (tree->leftop != NULL) { affiche_tree(tree->leftop, depth+1); } else { printf("X\n"); }
-    n_tab(depth); printf("  rop: "); if (tree->rightop != NULL) { affiche_tree(tree->rightop, depth+1); } else { printf("X\n"); }
-    n_tab(depth); printf("  nxt: "); if (tree->next != NULL) { affiche_tree(tree->next, depth+1); } else { printf("X\n"); }
-    n_tab(depth); printf("}\n");
-}
-
-
 // PARSER
 
 syntax_tree* parse_math(maillon** lex, char* closing_lexeme)
