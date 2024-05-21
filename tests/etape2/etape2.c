@@ -1,5 +1,5 @@
 /*
-    La fonction principale du fichier.
+    La fonction principale du fichier
 */
 
 int main() {

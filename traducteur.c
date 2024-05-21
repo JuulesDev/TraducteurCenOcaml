@@ -22,21 +22,21 @@ void traducteur(lexeme_list* lexemes)
             }
             
         }
-        if (lex->type ==LxmVariable){
+        else if (lex->type ==LxmVariable){
             printf("%s ",lex->content);
         }
-        if (lex->type == LxmAffectation){
+        else if (lex->type == LxmAffectation){
             printf("%s ref ",lex->content);
         }
-        if (lex->type ==LxmInt){
+        else if (lex->type ==LxmInt){
             printf("%s",lex->content);
         }
-        if (lex->type ==LxmPunctuation){
+        else if (lex->type ==LxmPunctuation){
             if (strcmp(lex->content, ";")==0){
                 printf(";\n");
             }
         }
-        if (lex->type ==LxmOperator){
+        else if (lex->type ==LxmOperator){
             printf("%s",lex->content );
         }
     }
@@ -46,7 +46,7 @@ int main()
 {
     // Cree la liste de lexemes du fichier
     //FILE* source_file = fopen("./test.c", "r");
-    FILE* source_file = fopen("./tests/etape1/etape1.c", "r");
+    FILE* source_file = fopen("./tests/etape2/etape2.c", "r");
     lexeme_list* l = lexeur(source_file);
 
     printf("\n===\n");

@@ -21,7 +21,8 @@ typedef enum {
     LxmAffectation,
     LxmType,
     LxmKeyWord,
-    LxmVariable
+    LxmVariable,
+    LxmComment
 } LexemeType;
 
 /*

@@ -126,15 +126,25 @@ lexeme_list* lexeur(FILE* fichier)
         { // Cas 2 : Ponctuation
             char* arg = create_arg(&c, 1);
             add_list(&fin, LxmPunctuation, arg);
-
-            c = fgetc(fichier);
+            c=fgetc(fichier);
         } 
         else if (is_char_in(c, operateurs_simples, len_ops))
         { // Cas 3 : Opérateur simple
-            char* arg = create_arg(&c, 1);
+            char d=c;
+            c=fgetc(fichier);
+            buffer[0] = d;
+            buffer[1] = c;
+            buffer[2]='\0';
+            len_buffer = 2;
+            //détection commentaire avec //
+            if (strcmp(buffer, "//")==0 || strcmp(buffer,"/*")==0 || strcmp(buffer,"*/")==0){
+                add_list(&fin, LxmComment,create_arg(buffer, len_buffer));
+                c = fgetc(fichier);
+            }
+            else{
+            char* arg = create_arg(&d, 1);
             add_list(&fin, LxmOperator, arg);
-            
-            c = fgetc(fichier);
+            }
         }
         else if (is_char_in(c, operateurs_doubles, len_opd))
         { // Cas 4 : Opérateur double
