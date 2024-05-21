@@ -99,7 +99,7 @@ lexeme_list* lexeur(FILE* fichier)
 {
     // Crée le maillon de début.
     lexeme_list* lex = malloc(sizeof(lexeme_list));
-    lex->type = LmxStart; 
+    lex->type = LxmStart; 
     lex->content = NULL;
     lexeme_list* fin = lex; // Pour ajouter de nouveaux maillons.
 

@@ -4,7 +4,15 @@
 #include <stdbool.h>
 
 #include "./lexer/lexer.h"
-#include "./parser/parser.h"
+
+void traducteur(lexeme_list* lexemes)
+{
+    lexeme_list* lex = lexemes->next; // Le lexeme actuel (passe le premier).
+    while (lex->type != LxmEnd)
+    {
+        lex = lex->next;
+    }
+}
 
 int main()
 {
@@ -13,13 +21,10 @@ int main()
     // FILE* source_file = fopen("./tests/etape1/etape1.c", "r");
     lexeme_list* l = lexeur(source_file);
 
-
-    ast* ast = parse(l);
-
     printf("\n===\n");
 
     print_list(l);
-    print_tree(*ast);
+    traducteur(l);
 
     free_list(l);
 }

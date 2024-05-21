@@ -12,7 +12,7 @@
     Un type de lexème.
 */
 typedef enum {
-    LmxStart,
+    LxmStart,
     LxmEnd,
     LxmInt,
     LxmString,
