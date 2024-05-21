@@ -39,6 +39,14 @@ void traducteur(lexeme_list* lexemes)
         else if (lex->type ==LxmOperator){
             printf("%s",lex->content );
         }
+        else if(lex->type ==LxmComment){
+            if (strcmp(lex->content,"//")==0 || strcmp(lex->content,"/*")==0){
+                printf("(* ");
+            }
+            else{
+                printf("*) \n");
+            }
+        }
     }
 }
 
