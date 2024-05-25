@@ -71,8 +71,8 @@ bool is_string_in(char* s, const char* tab[], const int len)
 // === LEXEUR ===
 
 // Listes des lexèmes qu'on souhaite détecter.
-const char ponctuation[] = {'(', ')', '{', '}', ';'};
-const int len_ponctuation = 5;
+const char ponctuation[] = {'(', ')', '{', '}', ';',','};
+const int len_ponctuation = 6;
 
 const char* type[] = {"bool", "int", "void"};
 const int len_type = 3; 
