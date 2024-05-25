@@ -50,17 +50,19 @@ void traducteur(lexeme_list* lexemes)
                 printf(";\n");
             }
             if (strcmp(lex->content,"(")==0 ){
-                if (parenthese_fonction>0){
-                    parenthese_fonction=parenthese_fonction+1;
+                if (parenthese_fonction>0){ 
+                    parenthese_fonction=parenthese_fonction+1; //augmente le compteur des parenthèse pour les arguments d'une fonction
                 }
                 printf("(");
             }
             if (strcmp(lex->content,")")==0){
                 if (parenthese_fonction==1){
-                    parenthese_fonction=-1;
+                    parenthese_fonction=-1; // cas de la dernière parenthèse que l'on affiche pas à la fin des arguments d'une fonction 
                 }
                 else{
-                    parenthese_fonction=parenthese_fonction-1;
+                    if (parenthese_fonction>0){
+                    parenthese_fonction=parenthese_fonction-1; //diminue le compteur des parenthèse en argument
+                    }
                     printf(")");
                 }
             }
