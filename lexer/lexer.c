@@ -77,8 +77,8 @@ const int len_ponctuation = 6;
 const char* type[] = {"bool", "int", "void"};
 const int len_type = 3; 
 
-const char* motcle[] = {"while"};
-const int len_motcle = 1;
+const char* motcle[] = {"while","if", "for","printf"};
+const int len_motcle = 4;
 
 const char operateurs_simples[] = {'+', '-', '*', '%'};
 const int len_ops = 4;
