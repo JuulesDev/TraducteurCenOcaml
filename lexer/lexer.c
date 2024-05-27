@@ -102,7 +102,6 @@ lexeme_list* lexeur(FILE* file)
     lex->type = LxmStart; 
     lex->content = NULL;
     lexeme_list* fin = lex; // Pour ajouter de nouveaux maillons.
-    int in_commentary =0; //pour savoir si on est dans un commentaire
 
     // Buffer permettant de lire les arguments.
     char buffer[100];
@@ -228,10 +227,6 @@ lexeme_list* lexeur(FILE* file)
         } 
         else if (c == ' ' || c == '\n')
         { // Cas 7 : Ignore les espaces blancs
-        if (in_commentary==1 && c=='\n'){
-            in_commentary=0;
-            add_list(&fin,LxmComment,create_arg("\n",1));
-        }
             c = fgetc(file);
         }
         else
