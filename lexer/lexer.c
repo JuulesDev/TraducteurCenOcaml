@@ -80,11 +80,11 @@ const int len_type = 3;
 const char* motcle[] = {"while"};
 const int len_motcle = 1;
 
-const char operateurs_simples[] = {'+', '-', '/', '*', '%'};
-const int len_ops = 5;
+const char operateurs_simples[] = {'+', '-', '*', '%'};
+const int len_ops = 4;
 
-const char operateurs_doubles[] = {'=', '|', '&','<','>','!'};
-const int len_opd = 6;
+const char operateurs_doubles[] = {'=', '|', '&', '<', '>', '!', '/'};
+const int len_opd = 7;
 
 /*
     Crée une liste de lexèmes à partir d'un fichier.
@@ -95,7 +95,7 @@ const int len_opd = 6;
     Renvoie:
         - lexeme_list*: La liste de lexèmes issue du fichier.
 */
-lexeme_list* lexeur(FILE* fichier)
+lexeme_list* lexeur(FILE* file)
 {
     // Crée le maillon de début.
     lexeme_list* lex = malloc(sizeof(lexeme_list));
@@ -108,7 +108,7 @@ lexeme_list* lexeur(FILE* fichier)
     char buffer[100];
     int len_buffer;
 
-    char c = fgetc(fichier);
+    char c = fgetc(file);
     while (c != EOF)
     {
         len_buffer = 0; // On vide le buffer.
@@ -119,7 +119,7 @@ lexeme_list* lexeur(FILE* fichier)
             {
                 buffer[len_buffer] = c;
                 len_buffer += 1;
-                c = fgetc(fichier);
+                c = fgetc(file);
             }
             add_list(&fin, LxmInt, create_arg(buffer, len_buffer));
         } 
@@ -127,68 +127,78 @@ lexeme_list* lexeur(FILE* fichier)
         { // Cas 2 : Ponctuation
             char* arg = create_arg(&c, 1);
             add_list(&fin, LxmPunctuation, arg);
-            c=fgetc(fichier);
-        } 
+            c=fgetc(file);
+        }
         else if (is_char_in(c, operateurs_simples, len_ops))
         { // Cas 3 : Opérateur simple
-            char d=c;
-            c=fgetc(fichier);
-            buffer[0] = d;
-            buffer[1] = c;
-            buffer[2]='\0';
-            len_buffer = 2;
-            //détection commentaire avec //
-            if (strcmp(buffer, "//")==0 || strcmp(buffer,"/*")==0 || strcmp(buffer,"*/")==0){
-                add_list(&fin, LxmComment,create_arg(buffer, len_buffer));
-                c = fgetc(fichier);
-                if (strcmp(buffer, "//")==0){
-                    in_commentary=1;
-                }
-            }
-            else{
-            char* arg = create_arg(&d, 1);
+            char* arg = create_arg(&c, 1);
             add_list(&fin, LxmOperator, arg);
-            }
+            c = fgetc(file);
         }
         else if (is_char_in(c, operateurs_doubles, len_opd))
         { // Cas 4 : Opérateur double
             char d = c;
-            c = fgetc(fichier);
+            c = fgetc(file);
+            
+            buffer[0] = d;
+            buffer[1] = c;
+            len_buffer = 2;           
+            
+            if (!strcmp(create_arg(buffer, len_buffer), "//") || !strcmp(create_arg(buffer, len_buffer), "/*"))
+            { // Détection de commentaire
+                bool inline_comment = !strcmp(create_arg(buffer, len_buffer), "//");
 
-            if(is_char_in(c, operateurs_doubles, len_opd))
-            {
+                d = fgetc(file); // Avant-dernier caractère
+                c = fgetc(file); // Dernier caractére
+
                 buffer[0] = d;
-                buffer[1] = c;
-                len_buffer = 2;
+                len_buffer = 1;
+
+                while ((inline_comment && c != '\n') || (!inline_comment && d != '*' && c != '/'))
+                {
+                    buffer[len_buffer] = c;
+                    printf("%c", c);
+                    len_buffer += 1;
+                    d = c;
+                    c = fgetc(file);
+                }
+                
+                if (!inline_comment) { len_buffer -= 1; } // Le dernier caractère ne doit pas être là
+                
+                char* comment_content = create_arg(buffer, len_buffer);
+                add_list(&fin, LxmComment, comment_content);
+            }
+            else if(is_char_in(c, operateurs_doubles, len_opd))
+            { // Opérateur double
 
                 add_list(
                     &fin, LxmOperator,
                     create_arg(buffer, len_buffer)
                 );
 
-                c = fgetc(fichier);
+                c = fgetc(file);
             }
             else if (d == '=')
-            {
+            { // Affectation
                 char* arg = create_arg(&d, 1);
                 add_list(&fin, LxmAffectation, arg);
             }
             else
-            {
+            { // Opérateur simple
                 char* arg = create_arg(&d, 1);
                 add_list(&fin, LxmOperator, arg);
             }
         } 
         else if (c == '"')
         { // Cas 5 : Chaîne de caractères
-            c = fgetc(fichier);
+            c = fgetc(file);
             while (c != '"'){
                 buffer[len_buffer] = c;
                 len_buffer++;
-                c = fgetc(fichier);
+                c = fgetc(file);
             }
             
-            c = fgetc(fichier);
+            c = fgetc(file);
             add_list (&fin, LxmString, create_arg(buffer, len_buffer));
 
         } 
@@ -199,7 +209,7 @@ lexeme_list* lexeur(FILE* fichier)
             {
                 buffer[len_buffer] = c;
                 len_buffer++;
-                c = fgetc(fichier);
+                c = fgetc(file);
             }
             char* chaine = create_arg(buffer, len_buffer);
 
@@ -222,7 +232,7 @@ lexeme_list* lexeur(FILE* fichier)
             in_commentary=0;
             add_list(&fin,LxmComment,create_arg("\n",1));
         }
-            c = fgetc(fichier);
+            c = fgetc(file);
         }
         else
         {
