@@ -18,3 +18,4 @@ Un fichier `Traducteur` sera alors creer et il vous suffira de l'executer.
 - `./tests` : Contient les exemples utilises pour les tests.
     - Etape 1 : Fonction main, variables et int.
     - Etape 2 : Commentaires.
+    - Etape 3 : fonction printf.
