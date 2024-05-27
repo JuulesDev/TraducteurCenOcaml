@@ -72,12 +72,9 @@ void traducteur(lexeme_list* lexemes)
             printf("%s",lex->content );
         }
         else if(lex->type ==LxmComment){
-            if (strcmp(lex->content,"//")==0 || strcmp(lex->content,"/*")==0){ //cas parenthèse ouvrante
-                printf("(* ");
-            }
-            else{
-                printf("*) \n"); //cas parenthèse fermante
-            }
+            printf("(*");
+            printf("%s", lex->content);
+            printf("*)\n");
         }
         else if(lex->type ==LxmString){
             printf("%s ",lex->content);
@@ -88,8 +85,8 @@ void traducteur(lexeme_list* lexemes)
 int main()
 {
     // Cree la liste de lexemes du fichier
-    //FILE* source_file = fopen("./test.c", "r");
-    FILE* source_file = fopen("./tests/etape3/etape3.c", "r");
+    FILE* source_file = fopen("./test.c", "r");
+    // FILE* source_file = fopen("./tests/etape3/etape3.c", "r");
     lexeme_list* l = lexeur(source_file);
 
     printf("\n===\n");
