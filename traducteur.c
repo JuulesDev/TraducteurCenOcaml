@@ -14,53 +14,54 @@ void traducteur(lexeme_list* lexemes)
         
         lex = lex->next; 
         //printf("%d,%s\n",lex->type,lex->content);
-        if (lex -> type ==LxmType){ //écriture des types
-            if (strcmp(lex->next->content,"main")==0){//cas pour int main ou on skip tout
+        if (lex->type == LxmType){ //écriture des types
+            if (strcmp(lex->next->content,"main") == 0) { //cas pour int main ou on skip tout
                 lex =lex->next->next->next->next;
             }
-            else{
+            else 
+            { 
                 printf("let ");
             }
             
         }
-        else if (lex->type ==LxmVariable){//écriture des variables
-            if (strcmp(lex->content,"printf")==0){//cas pour printf
+        else if (lex->type == LxmVariable) { //écriture des variables
+            if (strcmp(lex->content,"printf") == 0) { //cas pour printf
                 printf("Printf.printf ");
                 lex=lex->next;
                 parenthese_fonction=1;
             }
             else{
-                if (strcmp(lex->next->content,"=")==0){//écriture definition variable
+                if (strcmp(lex->next->content,"=") == 0) { //écriture definition variable
                 printf("%s",lex->content);
                 }
                 else{
-                printf("!%s",lex->content);// écriture valeur variable avec !
+                printf("!%s",lex->content); //écriture valeur variable avec !
                 }
             }
             
         }
-        else if (lex->type == LxmAffectation){
+        else if (lex->type == LxmAffectation) {
             printf("%s ref ",lex->content);
         }
-        else if (lex->type ==LxmInt){
+        else if (lex->type == LxmInt) {
             printf("%s",lex->content);
         }
-        else if (lex->type ==LxmPunctuation){
-            if (strcmp(lex->content, ";")==0){
-                printf(";\n");
+        else if (lex->type == LxmPunctuation){
+            if (strcmp(lex->content, ";") == 0) {
+                printf(";;\n"); //double point virgule en fin de ligne 
             }
-            if (strcmp(lex->content,"(")==0 ){
+            if (strcmp(lex->content,"(") == 0 ){
                 if (parenthese_fonction>0){ 
                     parenthese_fonction=parenthese_fonction+1; //augmente le compteur des parenthèse pour les arguments d'une fonction
                 }
                 printf("(");
             }
-            if (strcmp(lex->content,")")==0){
-                if (parenthese_fonction==1){
-                    parenthese_fonction=-1; // cas de la dernière parenthèse que l'on affiche pas à la fin des arguments d'une fonction 
+            if (strcmp(lex->content,")") == 0){
+                if (parenthese_fonction == 1){
+                    parenthese_fonction = -1; //cas de la dernière parenthèse que l'on affiche pas à la fin des arguments d'une fonction 
                 }
                 else{
-                    if (parenthese_fonction>0){
+                    if (parenthese_fonction>0) {
                     parenthese_fonction=parenthese_fonction-1; //diminue le compteur des parenthèse en argument
                     }
                     printf(")");
@@ -68,7 +69,7 @@ void traducteur(lexeme_list* lexemes)
             }
 
         }
-        else if (lex->type ==LxmOperator){
+        else if (lex->type == LxmOperator){
             printf("%s",lex->content );
         }
         else if(lex->type ==LxmComment){
@@ -76,7 +77,7 @@ void traducteur(lexeme_list* lexemes)
             printf("%s", lex->content);
             printf("*)\n");
         }
-        else if(lex->type ==LxmString){
+        else if(lex->type == LxmString){
             printf("%s ",lex->content);
         }
     }
@@ -85,8 +86,8 @@ void traducteur(lexeme_list* lexemes)
 int main()
 {
     // Cree la liste de lexemes du fichier
-    FILE* source_file = fopen("./test.c", "r");
-    // FILE* source_file = fopen("./tests/etape3/etape3.c", "r");
+    //FILE* source_file = fopen("./test.c", "r");
+    FILE* source_file = fopen("./tests/etape3/etape3.c", "r");
     lexeme_list* l = lexeur(source_file);
 
     printf("\n===\n");
