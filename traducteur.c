@@ -89,17 +89,33 @@ void traducteur(lexeme_list* lexemes)
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+<<<<<<< HEAD
     // Cree la liste de lexemes du fichier
     //FILE* source_file = fopen("./test.c", "r");
     FILE* source_file = fopen("./tests/etape2/etape2.c", "r");
     lexeme_list* l = lexeur(source_file);
+=======
+    if (argc == 1)
+    { // On execute notre fichier de test.
+        FILE* source_file = fopen("./test.c", "r");
+        lexeme_list* l = lexeur(source_file);
+>>>>>>> dd0c636 (Ajout d'une base pour la sélection du fichier à traduire.)
 
-    printf("\n===\n");
+        printf("\n===\n");
 
-    print_list(l);
-    traducteur(l);
+        print_list(l);
+        traducteur(l);
 
-    free_list(l);
+        free_list(l);
+    } else if (argc == 2)
+    { // On execute le fichier spécifié.
+        FILE* source_file = fopen(argv[1], "r");
+        lexeme_list* l = lexeur(source_file);
+        traducteur(l);
+        free_list(l);
+    } else {
+        printf("Erreur: trop d'arguments. Il faut 0 ou 1 argument (le chemin du fichier à traduire).\n");
+    }
 }
