@@ -22,7 +22,7 @@ void indentation(int depth)
 void traducteur(lexeme_list* lexemes)
 {
     lexeme_list* lex = lexemes; // Le lexeme actuel (passe le premier).
-    int compteur_parenthese = -1; // Nombre de parenthèses après une fonction 
+    int compteur_parenthese = 0; // Nombre de parenthèses après une fonction 
 
     // Pile indiquant le bloc dans lequel on se trouve : 0 -> while/for, 1 -> if
     int* pile_bloc = malloc(sizeof(int)*20);
@@ -36,9 +36,7 @@ void traducteur(lexeme_list* lexemes)
         if (lex->type == LxmType){ //Traduction des Types
             if (strcmp(lex->next->content, "main") == 0) { //cas pour int main ou on skip tout
                 lex = lex->next->next->next->next;
-            }
-            else 
-            {
+            } else {
                 indentation(indice_pile_bloc);
                 printf("let "); //cas pour création d'une variable
             }
@@ -63,6 +61,9 @@ void traducteur(lexeme_list* lexemes)
         { //Traduction variable entier
             printf("%s", lex->content);
         }
+        else if(lex->type == LxmString) {
+            printf("\"%s\" ", lex->content);
+        }
         else if (lex->type == LxmPunctuation)
         { // Traduction de fin de ligne
             if (strcmp(lex->content, ";") == 0)
@@ -75,46 +76,39 @@ void traducteur(lexeme_list* lexemes)
                 }
             } else if (strcmp(lex->content,"(") == 0 )
             {
-                if (compteur_parenthese>0) { 
-                    compteur_parenthese += 1; //augmente le compteur des parenthèse pour les arguments d'une fonction
-                }
+                compteur_parenthese += 1; //augmente le compteur des parenthèse pour les arguments d'une fonction
                 printf("(");
             } else if (strcmp(lex->content,")") == 0)
             {
-                if (compteur_parenthese == 0)
+                if (compteur_parenthese != 0)
                 {
-                    compteur_parenthese = -1; //cas de la dernière parenthèse que l'on affiche pas à la fin des arguments d'une fonction 
-                } else {
-                    if (compteur_parenthese>0)
-                    {
-                        compteur_parenthese -= 1; //diminue le compteur des parenthèse en argument
-                    }
+                    compteur_parenthese -= 1; //diminue le compteur des parenthèse en argument
                     printf(")");
                 }
             } else if (strcmp(lex->content,"{") == 0)
             { 
                 if (pile_bloc[indice_pile_bloc] == 0) { // si la dernière fonction utilisée est une boucle 
                     printf("do \n");
-                    indice_pile_bloc += 1; //augmente le nombre d'itérateurs
-                } else { // si la dernière fonction utilisée est un condtion 
-                    printf(" (\n");
-                    indice_pile_bloc += 1; //augmente le nombre d'itérateurs
+                    indice_pile_bloc += 1;
+                } else { // si la dernière fonction utilisée est un condition 
+                    printf(" then begin\n");
+                    indice_pile_bloc += 1;
                 }
             } else if (strcmp(lex->content,"}")==0)
             {
                 if (indice_pile_bloc>0){
                     if (pile_bloc[indice_pile_bloc-1]==0){ // si la dernière fonction utilisée est une boucle 
                         printf("done\n");
-                        indice_pile_bloc-=1; //diminue le nombre d'itérateurs
+                        indice_pile_bloc -= 1;
                     } else { // si la dernière fonction utilisée est un condtion
-                        indice_pile_bloc -= 1; //diminue le nombre d'itérateurs
+                        indice_pile_bloc -= 1;
                         indentation(indice_pile_bloc); 
-                        printf(")\n");
+                        printf("end\n");
                     }
                 }
             }
         }
-        else if (lex->type == LxmOperator) { //cas pour les opérateurs 
+        else if (lex->type == LxmOperator) { //cas pour les opérateurs
             printf("%s", lex->content);
         }
         else if(lex->type == LxmComment) { //cas pour les commentaires
@@ -123,9 +117,6 @@ void traducteur(lexeme_list* lexemes)
             printf("%s", lex->content);
             printf("*)\n");
         }
-        else if(lex->type == LxmString) {
-            printf("\"%s\" ", lex->content);
-        }
         else if(lex->type == LxmKeyWord)
         {
             if (strcmp(lex->content, "printf") == 0)
@@ -133,7 +124,7 @@ void traducteur(lexeme_list* lexemes)
                 indentation(indice_pile_bloc);
                 printf("Printf.printf ");
                 lex=lex->next; //on passe pour passer la parenthèse
-                compteur_parenthese=0; //initialisation du compteur de parenthèse après une fonction à 0
+                compteur_parenthese = 0; //initialisation du compteur de parenthèse après une fonction à 0
             }
             else
             {
