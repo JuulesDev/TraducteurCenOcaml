@@ -31,42 +31,53 @@ void traducteur(lexeme_list* lexemes)
     while (lex->type != LxmEnd)
     {    
         lex = lex->next;
-        
         // printf("-> %d,%s\n",lex->type,lex->content);
-        if (lex->type == LxmType){ //Traduction des Types
-            if (strcmp(lex->next->content, "main") == 0) { //cas pour int main ou on skip tout
-                lex = lex->next->next->next->next;
+        
+        if (lex->type == LxmType){
+            if (strcmp(lex->next->content, "main") == 0) {
+                // On écrit le contenu du main dans le fichier directement
+                lex = lex->next->next->next->next; 
             } else {
+                // Cas de première assignation d'une variable, on gère le cas jusqu'au =
+                // Pour que le cas de base soit une réassignation
+                lex = lex->next;
+                char* var_name = lex->content;
+                lex = lex->next;
+
                 indentation(indice_pile_bloc);
-                printf("let "); //cas pour création d'une variable
-            }
-            
-        }
-        else if (lex->type == LxmVariable)
-        { //Traduction des variables
+                printf("let %s = ref ", var_name); // ATTENTION: CAS AVEC OPERATION BUG 
+            }            
+        } else if (lex->type == LxmVariable)
+        {
             if (strcmp(lex->next->content, "=") == 0)
-            { //écriture definition variable
+            {
+                // Cas de ré-assignation de variable
                 indentation(indice_pile_bloc);
                 printf("%s", lex->content);
             } else {
-                printf("!%s", lex->content); //écriture valeur variable avec !
-            }
-            
+                // On veut la valeur d'une variable, toutes sont des ref
+                printf("!%s", lex->content);
+            }            
         }
         else if (lex->type == LxmAffectation)
-        { //Traduction affectation de variable
-            printf(" = ref ");
+        {
+            // Forcèment une réassignation (autre cas déjà gérée)
+            printf(" := ");
         }
         else if (lex->type == LxmInt)
-        { //Traduction variable entier
+        {
             printf("%s", lex->content);
         }
         else if(lex->type == LxmString) {
-            printf("\"%s\" ", lex->content);
+            printf("\"%s\"", lex->content);
         }
         else if (lex->type == LxmPunctuation)
         { // Traduction de fin de ligne
-            if (strcmp(lex->content, ";") == 0)
+            if (strcmp(lex->content, ",") == 0)
+            {
+                // Entre les arguments d'une fonction
+                printf(" ");
+            } else if (strcmp(lex->content, ";") == 0)
             {
                 if (indice_pile_bloc > 0)
                 {
@@ -108,8 +119,15 @@ void traducteur(lexeme_list* lexemes)
                 }
             }
         }
-        else if (lex->type == LxmOperator) { //cas pour les opérateurs
-            printf("%s", lex->content);
+        else if (lex->type == LxmOperator) {
+            // Cas spéciaux si les opérateurs ne sont pas les mêmes
+            if (!strcmp(lex->content, "=="))
+            {
+                printf(" = ");
+            } else {
+                // Cas de base
+                printf(" %s ", lex->content);   
+            }
         }
         else if(lex->type == LxmComment) { //cas pour les commentaires
             indentation(indice_pile_bloc);
@@ -141,13 +159,16 @@ void traducteur(lexeme_list* lexemes)
             }
         }
     }
+
+    // Au pire ça change rien, au mieux on oublie pas le ;;, a changer
+    printf(";;\n");
 }
 
 int main(int argc, char* argv[])
 {
     if (argc == 1)
     { // On execute notre fichier de test.
-        FILE* source_file = fopen("./tests/etape4.c", "r");
+        FILE* source_file = fopen("./tests/etape1.c", "r");
         lexeme_list* l = lexeur(source_file);
 
         printf("\n===\n");
