@@ -27,6 +27,8 @@ void traducteur(lexeme_list* lexemes)
     // Pile indiquant le bloc dans lequel on se trouve : 0 -> while/for, 1 -> if
     int* pile_bloc = malloc(sizeof(int)*20);
     int indice_pile_bloc = 0;
+    // Si une parenthèse a été ouverte pour une assignation.
+    bool open_par_assignation = false;
 
     while (lex->type != LxmEnd)
     {    
@@ -45,7 +47,9 @@ void traducteur(lexeme_list* lexemes)
                 lex = lex->next;
 
                 indentation(indice_pile_bloc);
-                printf("let %s = ref ", var_name); // ATTENTION: CAS AVEC OPERATION BUG 
+                // On met des parenthèses
+                printf("let %s = ref (", var_name);
+                open_par_assignation = true;
             }            
         } else if (lex->type == LxmVariable)
         {
@@ -79,11 +83,19 @@ void traducteur(lexeme_list* lexemes)
                 printf(" ");
             } else if (strcmp(lex->content, ";") == 0)
             {
-                if (indice_pile_bloc > 0)
+                // On ferme une parenthèse potentielle.
+                if (open_par_assignation)
                 {
-                    printf(";\n"); // Dans un bloc
+                    open_par_assignation = false;
+                    printf(")"); 
+                }
+                if (indice_pile_bloc > 0 && open_par_assignation)
+                {
+                    printf(" in\n");
+                } else if (indice_pile_bloc > 0) {
+                    printf(";\n");
                 } else {
-                    printf(";;\n"); // Hors d'un bloc
+                    printf(";;\n");
                 }
             } else if (strcmp(lex->content,"(") == 0 )
             {
@@ -115,6 +127,11 @@ void traducteur(lexeme_list* lexemes)
                         indice_pile_bloc -= 1;
                         indentation(indice_pile_bloc); 
                         printf("end\n");
+                    }
+                    // Dans tous les cas, si on sort de tous les blocs, on ;;
+                    if (indice_pile_bloc == 0)
+                    {
+                        printf(";;\n");
                     }
                 }
             }
@@ -159,16 +176,13 @@ void traducteur(lexeme_list* lexemes)
             }
         }
     }
-
-    // Au pire ça change rien, au mieux on oublie pas le ;;, a changer
-    printf(";;\n");
 }
 
 int main(int argc, char* argv[])
 {
     if (argc == 1)
     { // On execute notre fichier de test.
-        FILE* source_file = fopen("./tests/etape2.c", "r");
+        FILE* source_file = fopen("./tests/etape4.c", "r");
         lexeme_list* l = lexeur(source_file);
 
         printf("\n===\n");
