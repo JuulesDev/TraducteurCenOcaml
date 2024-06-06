@@ -200,6 +200,7 @@ int main(int argc, char* argv[])
         lexeme_list* l = lexeur(source_file);
         traducteur(l);
         free_list(l);
+        printf(">> Le fichier %s.ml a été créé.", argv[1]);
     } else {
         printf("Erreur: trop d'arguments. Il faut 0 ou 1 argument (le chemin du fichier à traduire).\n");
     }
