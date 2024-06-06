@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
 {
     if (argc == 1)
     { // On execute notre fichier de test.
-        FILE* source_file = fopen("./tests/etape1.c", "r");
+        FILE* source_file = fopen("./tests/etape2.c", "r");
         lexeme_list* l = lexeur(source_file);
 
         printf("\n===\n");

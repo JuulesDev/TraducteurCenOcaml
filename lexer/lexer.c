@@ -156,13 +156,15 @@ lexeme_list* lexeur(FILE* file)
                 while ((inline_comment && c != '\n') || (!inline_comment && d != '*' && c != '/'))
                 {
                     buffer[len_buffer] = c;
-                    printf("%c", c);
                     len_buffer += 1;
                     d = c;
                     c = fgetc(file);
                 }
                 
-                if (!inline_comment) { len_buffer -= 1; } // Le dernier caractère ne doit pas être là
+                if (!inline_comment) {
+                    len_buffer -= 1; // Le dernier caractère ne doit pas être là
+                    c = fgetc(file); // Skip le / de fin de commentaire.
+                } 
                 
                 char* comment_content = create_arg(buffer, len_buffer);
                 add_list(&fin, LxmComment, comment_content);
