@@ -3,4 +3,7 @@
 Traducteur
 
 test.c
-target.ml
+
+# Ignore tous les fichier créés.
+./tests/*.ml
+*.ml
