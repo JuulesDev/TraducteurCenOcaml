@@ -176,6 +176,8 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             }
         }
     }
+
+    free(pile_bloc);
 }
 
 int main(int argc, char* argv[])
