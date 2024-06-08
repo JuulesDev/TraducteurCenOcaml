@@ -26,3 +26,4 @@ $ ./Traducteur <NomDuFichier>.c
     - Etape 1 : Fonction main, variables et int.
     - Etape 2 : Commentaires.
     - Etape 3 : fonction printf.
+    - Étape 4 : boucles et conditionnelles.
