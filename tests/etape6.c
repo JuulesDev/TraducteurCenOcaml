@@ -1,13 +1,14 @@
-// Fonction pour calculer la factorielle d'un nombre
-int factorielle(int n) {
-    if (n <= 1) {
-        return 1;
-    } else {
-        return n * factorielle(n - 1);
+// Fonction pour calculer la somme des entiers de 1 à n
+int sommeusquan(int n) {
+    int somme = 0;
+    for (int i = 1; i <= n; i+=1) {
+        somme = somme + i;
     }
+    return somme;
 }
 
 int main() {
-    int resultat = factorielle(5);
-    printf("Le résultat est %d\n", resultat);
+    int n = 5;
+    int resultat = sommejusquan(n);
+    printf("La somme des entiers de 1 à %d est : %d\n", n, resultat);
 }

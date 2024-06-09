@@ -35,9 +35,14 @@ void traducteur(lexeme_list* lexemes, FILE* target)
     int indice_pile_bloc = 0;
     // Si une parenthèse a été ouverte pour une assignation.
     bool open_par_assignation = false;
+    bool retour =false;
     //liste des noms des fonctions qui ont été assignée
     const char *noms_fonctions[100];
     int len_nf = 0;
+
+    const char *noms_reference[100];
+    int len_ref = 0;
+
 
     while (lex->type != LxmEnd)
     {    
@@ -61,6 +66,8 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 // On met des parenthèses
                 fprintf(target, "let %s = ref (", var_name);
                 open_par_assignation = true;
+                noms_reference[len_ref]=var_name;
+                len_ref+=1;
             }  
             else {
                 //cas de création d'une fonction
@@ -105,7 +112,12 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             }
             else {
                 // On veut la valeur d'une variable, toutes sont des ref
-                fprintf(target, "!%s", lex->content); //cas des noms de fonction que l'on a crée
+                if (is_string_in(lex->content,noms_reference,len_ref)==true){
+                    fprintf(target, "!%s", lex->content); //cas des noms de fonction que l'on a crée
+                }
+                else{
+                    fprintf(target, "%s", lex->content);
+                }
             }            
         }
         else if (lex->type == LxmAffectation)
@@ -130,11 +142,17 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             {
                 // On ferme une parenthèse potentielle.
                
-                if (indice_pile_bloc > 0 && open_par_assignation)
+                if (indice_pile_bloc > 0 && open_par_assignation )
                 {
                     fprintf(target, ") in\n");
                     open_par_assignation = false;
-                } else if (open_par_assignation){
+                    if (retour==true){
+                        indentation(indice_pile_bloc,target);
+                        fprintf(target,"!res\n");
+                        retour=false;
+                    }
+                } 
+                else if (open_par_assignation){
                     fprintf(target, ");;\n");
                     open_par_assignation =false;
                 }
@@ -146,13 +164,13 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             } else if (strcmp(lex->content,"(") == 0 )
             {
                 compteur_parenthese += 1; //augmente le compteur des parenthèse pour les arguments d'une fonction
-                fprintf(target, "(");
+                fprintf(target, " ");
             } else if (strcmp(lex->content,")") == 0)
             {
                 if (compteur_parenthese != 0)
                 {
                     compteur_parenthese -= 1; //diminue le compteur des parenthèse en argument
-                    fprintf(target, ")");
+                    fprintf(target, " ");
                 }
             } else if (strcmp(lex->content,"{") == 0)
             { 
@@ -162,6 +180,10 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 } 
                 else if (pile_bloc[indice_pile_bloc] == 1){ // si la dernière fonction utilisée est un condition 
                     fprintf(target, " then begin\n");
+                    indice_pile_bloc += 1;
+                }
+                else if (pile_bloc[indice_pile_bloc] == 5){ // si la dernière fonction utilisée est un condition 
+                    fprintf(target, " begin \n");
                     indice_pile_bloc += 1;
                 }
                 else if (pile_bloc[indice_pile_bloc]==4){//si la dernière fonction utilisée est une boucle for 
@@ -174,8 +196,10 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 }
             } else if (strcmp(lex->content,"}")==0)
             {
+                printf("%d\n",pile_bloc[indice_pile_bloc-1]);
                 if (indice_pile_bloc>0){
                     if (pile_bloc[indice_pile_bloc-1]==0){ // si la dernière fonction utilisée est une boucle 
+                        indentation(indice_pile_bloc, target);
                         fprintf(target, "done\n");
                         indice_pile_bloc -= 1;
                     } 
@@ -194,9 +218,9 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                     }
                     else
                     { // si la dernière fonction utilisée est une condtion
-                        indice_pile_bloc -= 1;
                         indentation(indice_pile_bloc, target); 
                         fprintf(target, "end\n");
+                        indice_pile_bloc -= 1;
                     }
                     // Dans tous les cas, si on sort de tous les blocs, on ;;
                     if (indice_pile_bloc == 0)
@@ -234,13 +258,17 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             else if (strcmp(lex->content, "return")==0){ //défini une variable pour le return
                 indentation(indice_pile_bloc, target);
                 fprintf(target, "let res = ref (");
-                pile_bloc[indice_pile_bloc-1]=3; //transforme la fonction en fonction avec valeur de retour dans la pile
                 open_par_assignation=true;
+                retour=true;
+            
             }
             else
             {    if (strcmp(lex->content,"for")==0){
                 lex=lex->next->next->next; // skip parenthèse + type
+                indentation(indice_pile_bloc, target);
                 fprintf(target,"let %s = ref (",lex->content);
+                noms_reference[len_ref]=lex->content;
+                len_ref+=1;
                 lex=lex->next->next; //skip =
                 if (lex->type=LxmInt){
                     fprintf(target,"%s-%s ) in \n",lex->content,lex->next->next->next->next->next->next->next->next->next->content); //affiche le nombre
@@ -271,9 +299,13 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 {
                     pile_bloc[indice_pile_bloc] = 0; //ajout d'une boucle while dans la pile
                 }
-                if (strcmp(lex->content, "if") == 0||strcmp(lex->content, "else")==0)
+                if (strcmp(lex->content, "if") == 0)
                 {
                     pile_bloc[indice_pile_bloc] = 1; //ajout d'une condition dans la pile 
+                }
+                if (strcmp(lex->content, "else")==0)
+                {
+                    pile_bloc[indice_pile_bloc] = 5; //ajout d'une condition dans la pile 
                 }
             }
         }
