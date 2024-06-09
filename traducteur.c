@@ -181,7 +181,7 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                     } 
                     else if (pile_bloc[indice_pile_bloc-1]==3){// si la dernière fonction utlisée est une fonction avec une valeur de retour
                         indentation(indice_pile_bloc, target);
-                        fprintf(target,"!res"); //affiche le résultat de res
+                        fprintf(target,"!res\n"); //affiche le résultat de res
                         indice_pile_bloc -= 1;
                     } 
                     else if (pile_bloc[indice_pile_bloc-1]==2){// si la dernière fonction utlisée est une fonction sans valeur de retour
@@ -271,7 +271,7 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 {
                     pile_bloc[indice_pile_bloc] = 0; //ajout d'une boucle while dans la pile
                 }
-                if (strcmp(lex->content, "if") == 0)
+                if (strcmp(lex->content, "if") == 0||strcmp(lex->content, "else")==0)
                 {
                     pile_bloc[indice_pile_bloc] = 1; //ajout d'une condition dans la pile 
                 }
