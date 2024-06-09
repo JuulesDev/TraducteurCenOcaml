@@ -135,7 +135,7 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                     fprintf(target, ") in\n");
                     open_par_assignation = false;
                 } else if (open_par_assignation){
-                    fprintf(target, " );\n");
+                    fprintf(target, ");;\n");
                     open_par_assignation =false;
                 }
                 else if (indice_pile_bloc > 0) {
