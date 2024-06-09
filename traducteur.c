@@ -198,9 +198,9 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             {
                 printf("%d\n",pile_bloc[indice_pile_bloc-1]);
                 if (indice_pile_bloc>0){
-                    if (pile_bloc[indice_pile_bloc-1]==0){ // si la dernière fonction utilisée est une boucle 
+                    if (pile_bloc[indice_pile_bloc-1]==0){ // si la dernière fonction utilisée est une boucle while
                         indentation(indice_pile_bloc, target);
-                        fprintf(target, "done\n");
+                        fprintf(target, "done;\n");
                         indice_pile_bloc -= 1;
                     } 
                     else if (pile_bloc[indice_pile_bloc-1]==3){// si la dernière fonction utlisée est une fonction avec une valeur de retour
@@ -213,7 +213,7 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                         indice_pile_bloc -= 1;}
                     else if (pile_bloc[indice_pile_bloc-1]==4){//si la dernière fonction utilisée est une boucle for 
                         indentation(indice_pile_bloc,target);
-                        fprintf(target, "done\n");
+                        fprintf(target, "done;\n");
                         indice_pile_bloc -=1;
                     }
                     else

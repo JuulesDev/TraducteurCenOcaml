@@ -1,5 +1,5 @@
 // Fonction pour calculer la somme des entiers de 1 à n
-int sommeusquan(int n) {
+int sommejusquan(int n) {
     int somme = 0;
     for (int i = 1; i <= n; i+=1) {
         somme = somme + i;
