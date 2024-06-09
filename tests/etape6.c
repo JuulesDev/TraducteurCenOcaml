@@ -7,3 +7,7 @@ int factorielle(int n) {
     }
 }
 
+int main() {
+    int resultat = factorielle(5);
+    printf("Le résultat est %d\n", resultat);
+}

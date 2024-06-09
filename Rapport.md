@@ -1,19 +1,19 @@
 Projet : traducteur C vers Ocaml
 
 Objectif :
-Ce projet a pour objectif de traduire un programme en C vers le langage OCaml.
-Le code en C fourni comprend 4 fichiers principaux : `traducteur.c`, `lexeme_list.c`,  `lexer.c`et `lexer.h`.
+Ce projet a pour objectif de traduire un programme en C, en OCaml.
+Le projet comprend 4 fichiers principaux : `traducteur.c`, `lexeme_list.c`,  `lexer.c`et `lexer.h`.
 
 ### `Traducteur.c` :
 Le fichier `traducteur.c` contient la fonction principale pour la traduction.
 
+**Pile de Blocs** :
+Une pile est utilisée pour suivre les différents blocs de code (condition et boucles).
+Elle permet de garder la même structure que le code C d'origine.
+
 **Indentation** :
 La fonction `indentation` permet de gérer l'indentation du code OCAML en fonction de la profondeur du bloc de code.
-Cela permet au code OCAML d'être généré indenté.
-
-**Pile de Blocs** :
-Une pile est utilisée pour suivre les différents blocs de code .
-Elle permet de gatder la même structure que le code c d'origine.
+Cela permet au code OCAML d'être bien indenté.
 
 **Gestion des Lexèmes** :
 La fonction `traducteur` parcourt la liste des lexèmes pour générer le code OCaml.
@@ -42,4 +42,4 @@ Elle utilise des buffers pour accumuler les caractères qui forment des lexèmes
 #### Choix Techniques :
 **Gestion des Parenthèses et Blocs** : L'utilisation d'une pile pour suivre les blocs de code et permet une bonne traduction.
 
-**Références et Mutabilité** : En OCaml: les variables  sont gérées avec des références .
+**Références et Mutabilité** : En OCaml: les variables sont gérées avec des références.
