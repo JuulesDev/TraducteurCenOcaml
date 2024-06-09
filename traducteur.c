@@ -30,7 +30,7 @@ void traducteur(lexeme_list* lexemes, FILE* target)
     lexeme_list* lex = lexemes; // Le lexeme actuel (passe le premier).
     int compteur_parenthese = 0; // Nombre de parenthèses après une fonction 
 
-    // Pile indiquant le bloc dans lequel on se trouve : 0 -> while/for, 1 -> if, 2 -> fonction
+    // Pile indiquant le bloc dans lequel on se trouve : 0 -> while/for, 1 -> if, 2 -> fonction, 3->fonction avec return, 4->boucle for
     int* pile_bloc = malloc(sizeof(int)*20);
     int indice_pile_bloc = 0;
     // Si une parenthèse a été ouverte pour une assignation.
@@ -159,10 +159,15 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 if (pile_bloc[indice_pile_bloc] == 0) { // si la dernière fonction utilisée est une boucle 
                     fprintf(target, "do \n");
                     indice_pile_bloc += 1;
-                } else if (pile_bloc[indice_pile_bloc] == 1){ // si la dernière fonction utilisée est un condition 
+                } 
+                else if (pile_bloc[indice_pile_bloc] == 1){ // si la dernière fonction utilisée est un condition 
                     fprintf(target, " then begin\n");
                     indice_pile_bloc += 1;
                 }
+                else if (pile_bloc[indice_pile_bloc]==4){//si la dernière fonction utilisée est une boucle for 
+                        fprintf(target, "do \n");
+                        indice_pile_bloc +=1;
+                    }
                 else{ //si la dernière fonction utilisée est une fonction 
                     fprintf(target, " =\n");
                     indice_pile_bloc += 1;
@@ -182,8 +187,13 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                     else if (pile_bloc[indice_pile_bloc-1]==2){// si la dernière fonction utlisée est une fonction sans valeur de retour
                         indentation(indice_pile_bloc, target);
                         indice_pile_bloc -= 1;}
+                    else if (pile_bloc[indice_pile_bloc-1]==4){//si la dernière fonction utilisée est une boucle for 
+                        indentation(indice_pile_bloc,target);
+                        fprintf(target, "done\n");
+                        indice_pile_bloc -=1;
+                    }
                     else
-                    { // si la dernière fonction utilisée est un condtion
+                    { // si la dernière fonction utilisée est une condtion
                         indice_pile_bloc -= 1;
                         indentation(indice_pile_bloc, target); 
                         fprintf(target, "end\n");
@@ -228,7 +238,33 @@ void traducteur(lexeme_list* lexemes, FILE* target)
                 open_par_assignation=true;
             }
             else
-            {
+            {    if (strcmp(lex->content,"for")==0){
+                lex=lex->next->next->next; // skip parenthèse + type
+                fprintf(target,"let %s = ref (",lex->content);
+                lex=lex->next->next; //skip =
+                if (lex->type=LxmInt){
+                    fprintf(target,"%s-%s ) in \n",lex->content,lex->next->next->next->next->next->next->next->next->next->content); //affiche le nombre
+                }
+                else{
+                    fprintf(target,"!%s-%s ) in \n",lex->content,lex->next->next->next->next->next->next->next->next->next->content); //affiche la valeur de la variable
+                }
+                lex=lex->next;
+                indentation(indice_pile_bloc,target);
+                fprintf(target,"while (");
+                pile_bloc[indice_pile_bloc] = 0; //ajout d'une boucle for dans la pile
+                indice_pile_bloc+=1;
+                lex=lex->next; //skip le ;
+                fprintf(target,"!%s ",lex->content);//print variable
+                lex=lex->next;
+                fprintf(target,"%s ",lex->content);//print condition
+                lex=lex->next;
+                fprintf(target,"%s ) do\n ",lex->content);//print valeur + fin
+                lex=lex->next->next;
+                indentation(indice_pile_bloc,target);
+                fprintf(target,"%s := !%s %s %s;\n",lex->content,lex->content,lex->next->content,lex->next->next->next->content);
+                lex=lex->next->next->next->next->next;
+            }
+            else{
                 indentation(indice_pile_bloc, target);
                 fprintf(target, "%s ",lex->content); //Cas des mots clés pour les boucles
                 if (strcmp(lex->content, "while") == 0)
@@ -242,7 +278,7 @@ void traducteur(lexeme_list* lexemes, FILE* target)
             }
         }
     }
-
+    }
     free(pile_bloc);
 }
 
@@ -252,7 +288,7 @@ int main(int argc, char* argv[])
     { // On traduit nos fichiers de test.
         char source_file_path[17] = "./tests/etapeN.c";
         char target_file_path[18] = "./tests/etapeN.ml";
-        for (int i = 1; i < 6; i += 1)
+        for (int i = 1; i < 7; i += 1)
         {
             // Modifie le numéro du test
             source_file_path[13] = i + '0';
